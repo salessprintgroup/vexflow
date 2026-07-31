@@ -63,9 +63,6 @@ TABLE = {
     # --- settings window: frame ----------------------------------------------
     "{} Settings": "Ustawienia {}",
     "Interface language": "Język interfejsu",
-    "Restart to apply": "Uruchom ponownie",
-    "Applied after the restart in step 3.":
-        "Zadziała po ponownym uruchomieniu w kroku 3.",
     "Keys": "Klucze",
     "Dictation": "Dyktowanie",
     "Cleanup": "Czyszczenie",

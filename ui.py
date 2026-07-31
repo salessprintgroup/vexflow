@@ -132,6 +132,49 @@ class SettingsWindow(NSObject):
         self.window.performClose_(None)
 
     @objc.python_method
+    def rebuild(self):
+        """Draw the window again from scratch, in whatever language is current now.
+
+        Every control here was created with its text baked in, so relabelling them one
+        by one would mean a second list of every string in the file — a list that would
+        drift. Throwing the window away is the version that cannot drift.
+
+        What has to survive the swap is what the user would notice: whether the window
+        is open, where it sits, which tab is showing, and any key typed but not yet
+        saved.
+        """
+        if self.window is None:
+            return
+        visible = self.window.isVisible()
+        origin = self.window.frame().origin
+        tab = self.tabs.indexOfTabViewItem_(self.tabs.selectedTabViewItem())
+        typed = {ident: str(f.stringValue())
+                 for ident, f in self._key_fields.items() if f.stringValue()}
+
+        # Drop the delegate first: the teardown below is not a close, and
+        # windowWillClose_ would kill the refresh timer and send the app to the
+        # background halfway through.
+        self.window.setDelegate_(None)
+        self.window.orderOut_(None)
+        self.window = None
+        self._key_fields = {}
+        self._key_status = {}
+        self._help_idents = []
+        self._popover = None
+
+        self._build()
+        for ident, text in typed.items():
+            field = self._key_fields.get(ident)
+            if field is not None:
+                field.setStringValue_(text)
+        if 0 <= tab < self.tabs.numberOfTabViewItems():
+            self.tabs.selectTabViewItemAtIndex_(tab)
+        self.refresh()
+        if visible:
+            self.window.setFrameOrigin_(origin)
+            self.window.makeKeyAndOrderFront_(None)
+
+    @objc.python_method
     def _build(self):
         style = (AppKit.NSWindowStyleMaskTitled
                  | AppKit.NSWindowStyleMaskClosable
@@ -153,15 +196,10 @@ class SettingsWindow(NSObject):
         self.ui_lang_popup = w.popup(ui_lang_entries, COL, top - 2, 170, self,
                                      b"changeUILanguage:")
         content.addSubview_(self.ui_lang_popup)
-        # Title set when it is needed, so the prompt arrives in the language just
-        # chosen — which is also the clearest possible confirmation it was understood.
-        self.ui_restart_button = w.button("", COL + 180, top - 2, 160, self,
-                                          b"restartApp:")
-        self.ui_restart_button.setHidden_(True)
-        content.addSubview_(self.ui_restart_button)
 
         tabs = AppKit.NSTabView.alloc().initWithFrame_(
             NSMakeRect(10, FOOTER_H, WIDTH - 20, HEIGHT - FOOTER_H - 10 - HEADER_H))
+        self.tabs = tabs
         for title, builder in (("Keys", self._tab_keys),
                                ("Dictation", self._tab_dictation),
                                ("Cleanup", self._tab_cleanup),
@@ -660,12 +698,13 @@ class SettingsWindow(NSObject):
         if not value or value == strings.language():
             return
         settings.set("ui_language", value)
-        # Every label already on screen — this window, the menu bar, the setup guide —
-        # was drawn in the old language. Redrawing all of it in place is a wide change
-        # for something done once; a restart takes a second and cannot leave half the
-        # interface behind. t() answers in the new language from here on.
-        self.ui_restart_button.setTitle_(t("Restart to apply"))
-        self.ui_restart_button.setHidden_(False)
+        # Everything drawn once — labels, buttons, tab names, menu items — keeps the
+        # language it was drawn in, while anything recomputed on the refresh tick
+        # switches immediately. Left alone that produces a half-translated window,
+        # which reads as a broken app rather than as "restart to finish". So redraw
+        # the lot, here, now: the app delegate owns the menu bar and both windows.
+        import vexflow_app
+        vexflow_app.relanguage()
 
     def changeLanguage_(self, sender):
         value = w.selected_value(sender, config.LANGUAGES)

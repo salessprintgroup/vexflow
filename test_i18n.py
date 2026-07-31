@@ -139,6 +139,60 @@ def clipped(code):
     return out
 
 
+# --- does changing the language actually change the window -------------------
+
+def _texts(view, out):
+    """Every string currently drawn in a window, in tree order."""
+    for child in view.subviews():
+        if isinstance(child, AppKit.NSTextField):
+            out.append(str(child.stringValue()))
+        elif isinstance(child, (AppKit.NSButton, AppKit.NSPopUpButton)):
+            out.append(str(child.title()))
+        _texts(child, out)
+        if isinstance(child, AppKit.NSTabView):
+            for item in child.tabViewItems():
+                out.append(str(item.label()))
+                if item.view() is not None:
+                    _texts(item.view(), out)
+
+
+def relanguage_works():
+    """Redrawing has to replace the labels, not only the parts refresh() recomputes.
+
+    This is the regression that shipped in 1.2: the language changed, the status lines
+    and placeholders followed it immediately, and every label, button and tab name kept
+    the language it was built in. Half a translated window looks like a broken app, so
+    it is worth a test of its own rather than a promise in a comment.
+    """
+    import onboarding
+    import ui
+    failures = []
+    for cls, make in (("settings", lambda: ui.SettingsWindow.alloc().initWithEngine_(None)),
+                      ("welcome", lambda: onboarding.WelcomeWindow.alloc().initWithApp_(None))):
+        os.environ["VEXFLOW_UI_LANG"] = "en"
+        win = make()
+        win._build()
+        before = []
+        _texts(win.window.contentView(), before)
+
+        os.environ["VEXFLOW_UI_LANG"] = "de"
+        win.rebuild()
+        after = []
+        _texts(win.window.contentView(), after)
+
+        if len(before) != len(after):
+            failures.append("%s: %d controls before, %d after" % (cls, len(before), len(after)))
+            continue
+        moved = sum(1 for a, b in zip(before, after) if a != b and a.strip())
+        if moved < 10:
+            failures.append("%s: only %d of %d strings changed language"
+                            % (cls, moved, len(before)))
+        else:
+            print("%-9s ok    %d of %d strings redrawn in the new language"
+                  % (cls, moved, len(before)))
+    return failures
+
+
 # --- report ------------------------------------------------------------------
 
 def main(argv):
@@ -184,7 +238,12 @@ def main(argv):
             failures += 1
 
     print()
-    print("%d language(s) checked, %d with problems" % (len(codes), failures))
+    for problem in relanguage_works():
+        print("relanguage FAIL  %s" % problem)
+        failures += 1
+
+    print()
+    print("%d language(s) checked, %d problem(s)" % (len(codes), failures))
     return 1 if failures else 0
 
 

@@ -113,10 +113,6 @@ class WelcomeWindow(NSObject):
         self.ui_lang_popup = w.popup(ui_lang_entries, PAD + 160, y - 2, 170, self,
                                      b"changeUILanguage:")
         v.addSubview_(self.ui_lang_popup)
-        # Filled in only after a change, in the language just chosen — which confirms
-        # the choice landed, in the one way that needs no translating.
-        self.ui_lang_note = w.note("", PAD + 344, y - 2, WIDTH - PAD - 344, 30, size=11)
-        v.addSubview_(self.ui_lang_note)
         y -= 34
 
         self.progress = w.progress_bar(PAD, y, WIDTH - PAD * 2)
@@ -254,9 +250,10 @@ class WelcomeWindow(NSObject):
         if not value or value == strings.language():
             return
         settings.set("ui_language", value)
-        # No separate restart button here: step 3 of this very window is a restart, and
-        # that is when the new language arrives. Saying so is enough.
-        self.ui_lang_note.setStringValue_(t("Applied after the restart in step 3."))
+        # Redraw immediately rather than wait for the restart in step 3: somebody who
+        # cannot read this window needs it to change while they are looking at it.
+        import vexflow_app
+        vexflow_app.relanguage()
 
     def openSettings_(self, _sender):
         self.window.performClose_(None)
@@ -265,6 +262,23 @@ class WelcomeWindow(NSObject):
 
     def closeWindow_(self, _sender):
         self.window.performClose_(None)
+
+    @objc.python_method
+    def rebuild(self):
+        """Draw the window again in the current language. See ui.SettingsWindow."""
+        if self.window is None:
+            return
+        visible = self.window.isVisible()
+        origin = self.window.frame().origin
+        self.window.setDelegate_(None)
+        self.window.orderOut_(None)
+        self.window = None
+        self.rows = {}
+        self._build()
+        self.refresh()
+        if visible:
+            self.window.setFrameOrigin_(origin)
+            self.window.makeKeyAndOrderFront_(None)
 
 
 def needs_setup():

@@ -7,7 +7,7 @@ Everything else in this file is edit-and-restart.
 import os
 
 APP_NAME = "Vexflow"
-VERSION = "1.2"
+VERSION = "1.2.1"
 # Interface languages, each written in itself: that is how somebody finds their own in
 # a list they cannot yet read. English is the source language — its strings are the
 # lookup keys in strings.py, so it is the one entry with no table of its own.

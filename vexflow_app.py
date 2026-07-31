@@ -100,6 +100,23 @@ def _hotkey_summary():
     return "  ·  ".join(parts)
 
 
+def relanguage():
+    """Redraw every piece of interface that was drawn in the previous language.
+
+    Called when the interface language changes. Without it the parts recomputed on the
+    refresh tick — status lines, the balance, field placeholders — switch at once while
+    labels, buttons, tab names and menu items keep the old language, and a half
+    translated window reads as a broken app rather than as a pending restart.
+    """
+    if _DELEGATE is None:
+        return
+    _install_main_menu()          # About / Hide / Quit / the Edit menu
+    _DELEGATE._build_menu()       # the menu bar menu, titles and all
+    for window in (_DELEGATE.settings_window, _DELEGATE.welcome_window):
+        if window is not None:
+            window.rebuild()
+
+
 def _install_main_menu():
     """Give the process an application menu and an Edit menu.
 

@@ -63,9 +63,6 @@ TABLE = {
     # --- settings window: frame ----------------------------------------------
     "{} Settings": "{} ayarları",
     "Interface language": "Arayüz dili",
-    "Restart to apply": "Yeniden başlat",
-    "Applied after the restart in step 3.":
-        "3. adımdaki yeniden başlatmadan sonra geçerli olur.",
     "Keys": "Anahtarlar",
     "Dictation": "Dikte",
     "Cleanup": "Temizlik",

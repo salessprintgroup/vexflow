@@ -64,9 +64,6 @@ TABLE = {
     # --- settings window: frame ----------------------------------------------
     "{} Settings": "{}-Einstellungen",
     "Interface language": "Sprache der Oberfläche",
-    "Restart to apply": "Neu starten",
-    "Applied after the restart in step 3.":
-        "Gilt nach dem Neustart in Schritt 3.",
     "Keys": "Schlüssel",
     "Dictation": "Diktat",
     "Cleanup": "Bereinigung",

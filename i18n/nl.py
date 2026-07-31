@@ -64,9 +64,6 @@ TABLE = {
     # --- settings window: frame ----------------------------------------------
     "{} Settings": "{}-instellingen",
     "Interface language": "Taal van de interface",
-    "Restart to apply": "Herstart",
-    "Applied after the restart in step 3.":
-        "Geldt na de herstart in stap 3.",
     "Keys": "Sleutels",
     "Dictation": "Dicteren",
     "Cleanup": "Opschonen",
