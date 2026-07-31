@@ -91,7 +91,7 @@ It is sixty lines and it downloads one file.
 <details>
 <summary>Taking the .pkg from Releases instead</summary>
 
-Download **`Vexflow-1.2.2.pkg`** from
+Download **`Vexflow-1.2.3.pkg`** from
 [Releases](https://github.com/salessprintgroup/vexflow/releases) into your Downloads
 folder, then paste one line into Terminal:
 
@@ -118,7 +118,9 @@ in 2024:
 </details>
 
 The installer puts Vexflow in Applications, builds the Python environment it runs in,
-and starts it at login. Then Vexflow opens a setup guide with four steps:
+and starts it at login. On a Mac that has never had developer tools installed there is
+no Python to build it from, and Vexflow offers to have macOS install Apple's Command
+Line Tools rather than leaving you with a command to type. Then Vexflow opens a setup guide with four steps:
 
 <p align="center">
   <img src="docs/setup-guide.png" width="70%" alt="Setup guide">

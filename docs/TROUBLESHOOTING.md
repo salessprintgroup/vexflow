@@ -166,7 +166,7 @@ System Settings, add it back, and restart Vexflow.
 
 ## The installer will not open
 
-**"Vexflow-1.2.2.pkg cannot be opened because it is from an unidentified developer."**
+**"Vexflow-1.2.3.pkg cannot be opened because it is from an unidentified developer."**
 The package is not signed with a paid Apple certificate, so Gatekeeper stops the first
 open. Put the package in your Downloads folder and paste this into Terminal:
 
@@ -184,10 +184,15 @@ Security → Open Anyway** — Sequoia removed the right-click override that old
 accepted. On **macOS 14**, right-click the package in Finder, choose **Open**, then
 **Open** again in the dialog.
 
-**The install finishes but no icon appears.** The environment build may have failed.
-The usual cause is no usable Python on the Mac; install the Command Line Tools with
-`xcode-select --install` and run the installer again. The installer's own output is in
-the system log — Console → Log Reports → `install.log`.
+**The install finishes but no icon appears.** The environment build failed. On a Mac
+that has never had developer tools on it there is no usable Python — macOS ships
+`/usr/bin/python3` as a stub — and Vexflow now says so on first launch and offers to
+have macOS install Apple's Command Line Tools. Say yes, wait for Apple's installer to
+finish, then open Vexflow again.
+
+If that dialog never appeared, the environment failed for some other reason. The
+installer's own output is in the system log — Console → Log Reports → `install.log` —
+and switching the diagnostic log on in Settings captures the next attempt.
 
 ---
 

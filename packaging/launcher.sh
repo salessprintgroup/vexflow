@@ -35,6 +35,32 @@ if [ ! -x "$VENV/bin/python" ]; then
   # failure that happens before the app exists to switch logging on in.
   OUT="$("$RESOURCES/bootstrap.sh" "$RESOURCES" 2>&1)"; STATUS=$?
   printf '%s\n' "$OUT" >> "$LOG"
+
+  # Exit 2 means bootstrap.sh found no usable Python at all, which on a Mac that has
+  # never had developer tools on it is not a fault: macOS ships /usr/bin/python3 as a
+  # stub that does nothing until Apple's Command Line Tools are installed.
+  #
+  # Apple has an installer for exactly this, and `xcode-select --install` opens it. So
+  # open it, instead of printing a command for somebody to type into a terminal they
+  # have never used — that was the one step in a first install that needed a developer
+  # to be standing next to them. The download is Apple's, over Apple's channel, and
+  # this only asks for it: nothing is installed behind anyone's back.
+  if [ $STATUS -eq 2 ]; then
+    ANSWER="$(osascript -e 'display alert "Vexflow needs one more thing" message "macOS does not include Python until Apple’s developer tools are installed, and Vexflow is written in it.
+
+Vexflow can ask macOS to install them now. It is a free download from Apple and takes a few minutes. When it finishes, open Vexflow again." buttons {"Not now", "Install"} default button "Install"' 2>/dev/null)"
+    case "$ANSWER" in
+      *Install*)
+        echo "launcher: asking macOS to install the Command Line Tools" >> "$LOG"
+        # Returns immediately: Apple's own progress window takes it from here. It also
+        # exits non-zero when the tools are already present, which is not our problem.
+        xcode-select --install >> "$LOG" 2>&1 || true
+        ;;
+      *) echo "launcher: developer tools declined" >> "$LOG" ;;
+    esac
+    exit 1
+  fi
+
   if [ $STATUS -ne 0 ]; then
     DETAIL="$(printf '%s' "$OUT" | tail -3 | tr '\n"' '  ')"
     osascript -e "display alert \"Vexflow could not start\" message \"Setting up its Python environment failed. Installing the Xcode Command Line Tools usually fixes it: xcode-select --install\n\n$DETAIL\" as critical" 2>/dev/null || true
