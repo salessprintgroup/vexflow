@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="2">
+    <title>Vexflow</title>
+    <organization>org.salessprintgroup</organization>
+    <welcome file="welcome.html" mime-type="text/html"/>
+    <conclusion file="conclusion.html" mime-type="text/html"/>
+    <license file="LICENSE.txt" mime-type="text/plain"/>
+
+    <!-- No per-file customisation to offer: it is one app. -->
+    <options customize="never" require-scripts="true" hostArchitectures="arm64,x86_64"/>
+
+    <!-- The window server APIs this relies on behave differently before Sonoma, and
+         the app has only been tested from 14 onwards. -->
+    <volume-check>
+        <allowed-os-versions><os-version min="14.0"/></allowed-os-versions>
+    </volume-check>
+
+    <choices-outline>
+        <line choice="default">
+            <line choice="org.salessprintgroup.vexflow.app"/>
+        </line>
+    </choices-outline>
+    <choice id="default"/>
+    <choice id="org.salessprintgroup.vexflow.app" visible="false">
+        <pkg-ref id="org.salessprintgroup.vexflow.app"/>
+    </choice>
+    <pkg-ref id="org.salessprintgroup.vexflow.app" version="VERSION_PLACEHOLDER"
+             onConclusion="none">vexflow-app.pkg</pkg-ref>
+</installer-gui-script>

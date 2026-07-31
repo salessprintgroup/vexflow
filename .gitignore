@@ -1,0 +1,21 @@
+# Never commit secrets. Keys belong in the Keychain; these are here as a backstop.
+.env
+.env.*
+*.key
+vocabulary.txt
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+
+# Build artefacts — icons are generated from make_icon.py, the bundle from make_app.sh
+assets/
+Vexflow.app/
+
+# macOS
+.DS_Store
+
+# Release artefacts from make_release.sh
+build/
+dist/

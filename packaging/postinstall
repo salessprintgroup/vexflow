@@ -1,0 +1,84 @@
+#!/bin/bash
+# Runs as root once the app bundle is in place.
+#
+# Everything it creates belongs to the person who is logged in, not to root, so each
+# step drops privileges with `sudo -u`. Getting this wrong leaves a root-owned venv in
+# a user's home directory, which then fails at first launch with a permission error
+# that looks nothing like its cause.
+set -uo pipefail
+
+APP="/Applications/Vexflow.app"
+RESOURCES="$APP/Contents/Resources"
+LABEL="org.salessprintgroup.vexflow"
+
+CONSOLE_USER="$(stat -f%Su /dev/console)"
+if [ -z "$CONSOLE_USER" ] || [ "$CONSOLE_USER" = "root" ]; then
+  echo "no console user; skipping per-user setup" >&2
+  exit 0
+fi
+USER_ID="$(id -u "$CONSOLE_USER")"
+USER_HOME="$(dscl . -read "/Users/$CONSOLE_USER" NFSHomeDirectory | awk '{print $2}')"
+SUPPORT="$USER_HOME/Library/Application Support/Vexflow"
+LOG="$USER_HOME/Library/Logs/vexflow-install.log"
+
+# A fresh install starts with fresh logs. Both files used to be appended to and never
+# truncated, so one uninterrupted log survived every reinstall — and this one was
+# written by root, which left the user unable to delete it.
+rm -f "$USER_HOME/Library/Logs/vexflow.log"
+if [ -f "$SUPPORT/settings.json" ] &&
+   grep -q '"logging_enabled"[[:space:]]*:[[:space:]]*true' "$SUPPORT/settings.json"; then
+  install -d -o "$CONSOLE_USER" "$USER_HOME/Library/Logs" 2>/dev/null || true
+  : > "$LOG"
+  chown "$CONSOLE_USER" "$LOG" 2>/dev/null || true
+  exec > >(tee -a "$LOG") 2>&1
+else
+  # Logging is off (the default). Everything below still reaches the Installer's own
+  # /var/log/install.log, which is the system's to keep, not ours to create.
+  rm -f "$LOG"
+fi
+echo "=== Vexflow install $(date) ==="
+
+run_as_user() { sudo -u "$CONSOLE_USER" -H "$@"; }
+
+# 0. Hand the bundle to the person using it -------------------------------------
+# An app dragged in from a disk image belongs to whoever dragged it; one installed by
+# a package belongs to root. The difference shows up only at the end, when removing
+# Vexflow from its own Settings window suddenly needs an admin password and a dialog
+# signed "osascript". Same ownership, same behaviour.
+chown -R "$CONSOLE_USER" "$APP" 2>/dev/null || true
+
+# 1. Python environment ---------------------------------------------------------
+if ! run_as_user /bin/bash "$RESOURCES/bootstrap.sh" "$RESOURCES"; then
+  echo "environment setup failed — the app will retry on first launch" >&2
+  # Not fatal: the launcher retries and can explain itself in a dialog, which is far
+  # friendlier than the installer dying with a generic failure sheet.
+fi
+
+# 2. Start at login -------------------------------------------------------------
+PLIST="$USER_HOME/Library/LaunchAgents/$LABEL.plist"
+install -d -o "$CONSOLE_USER" "$USER_HOME/Library/LaunchAgents" 2>/dev/null || true
+cat > "$PLIST" <<PL
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>Label</key><string>$LABEL</string>
+  <key>ProgramArguments</key>
+  <array><string>$APP/Contents/MacOS/vexflow</string></array>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><dict><key>SuccessfulExit</key><false/></dict>
+</dict></plist>
+PL
+chown "$CONSOLE_USER" "$PLIST"
+
+# 3. (Re)start it ---------------------------------------------------------------
+# An upgrade over a running copy has to stop the old one first, or the new process
+# loses the single-instance lock and exits cleanly — which KeepAlive reads as "job
+# finished" and does not restart.
+run_as_user /bin/launchctl bootout "gui/$USER_ID/$LABEL" 2>/dev/null || true
+pkill -u "$CONSOLE_USER" -f "$APP/Contents/MacOS/vexflow" 2>/dev/null || true
+sleep 1
+run_as_user /bin/launchctl bootstrap "gui/$USER_ID" "$PLIST" 2>/dev/null \
+  || run_as_user /bin/launchctl load "$PLIST" 2>/dev/null || true
+
+echo "done"
+exit 0

@@ -1,0 +1,89 @@
+Vexflow
+Copyright (c) 2026 Sales Sprint Group LLC
+
+This software is distributed under the MIT License. The full text is in the LICENSE
+file, and it is the whole of the permission granted. Everything below explains what
+that permission does and does not cover; none of it adds a condition to the licence.
+
+
+TRADEMARKS
+
+The MIT License grants rights in copyright. It grants no rights in trademarks, service
+marks, trade names or logos.
+
+"Vexflow", "Sales Sprint Group" and the Vexflow sail icon are marks of Sales Sprint
+Group LLC. You may use the name "Vexflow" to say truthfully what your copy is or is
+derived from — "a fork of Vexflow", "based on Vexflow" — and you may not use it, or a
+name confusingly similar to it, as the name of your distribution, product or service,
+or in a way that suggests it is published, endorsed or supported by Sales Sprint Group
+LLC. Redistribute a modified version under your own name.
+
+This reservation is the ordinary practice for free software published by a company. It
+exists so that the name keeps meaning one thing to the people who install it.
+
+
+THIRD-PARTY SOFTWARE
+
+This repository contains no third-party code, and the installer package redistributes
+none. The package carries only the source in this repository. Everything else is
+fetched from the Python Package Index on the machine it is installed on, and each
+component reaches you under its own licence, from its own publisher:
+
+  sounddevice                     MIT License
+  PortAudio (inside the           MIT License
+    sounddevice distribution)
+  websockets                      BSD 3-Clause License
+  pyobjc-core, pyobjc-framework-* MIT License
+  cffi                            MIT-0 License
+  pycparser                       BSD 3-Clause License
+
+Vexflow also runs on a Python interpreter already present on the machine — from
+Homebrew, or the one that ships with Apple's Command Line Tools — under the Python
+Software Foundation License. It is not bundled and not redistributed here.
+
+Current licence texts belong to those projects and travel with them; the list above is
+attribution, not a substitute for reading them.
+
+
+OTHER NAMES
+
+Any name, mark or logo appearing in this software or its documentation that is not
+Vexflow's belongs to its owner. Such names appear only to identify what this software
+connects to, is compatible with, or runs on. No affiliation with, sponsorship by or
+endorsement from any of those owners is claimed or implied, in either direction.
+
+
+EXTERNAL SERVICES
+
+Vexflow is a client. It does nothing on its own: it carries what you dictate to
+external services that you choose, hold accounts with and pay directly, using
+credentials you supply.
+
+Those services are not operated by, controlled by, or answerable to Sales Sprint Group
+LLC. Their terms, prices, availability, security and handling of your data are set by
+them and are a matter between you and them. Nothing in this software or its
+documentation is a statement made on their behalf, a representation about what they
+do, or any kind of assurance about them — read their own current terms and check them
+yourself. Any charge incurred through your credentials is yours.
+
+
+YOUR CREDENTIALS
+
+API keys and any other credentials you enter are handled on an as-is basis, entirely
+at your own risk. Sales Sprint Group LLC gives no undertaking, of any kind, that a
+credential entered into this software cannot be read, copied, retained, transmitted,
+leaked or misused, and accepts no liability for any loss, cost, charge, disclosure or
+other consequence arising from it. Anything running under your user account can reach
+what your user account can reach; no application can promise otherwise. Judge that for
+yourself before entering a credential, and rotate anything you have doubts about.
+
+
+NO WARRANTY
+
+The software is provided "as is", without warranty of any kind, and the copyright
+holder accepts no liability, as set out in the LICENSE file. That disclaimer covers
+every description in this repository, including anything said about privacy, security,
+credential handling, data handling, accuracy, cost or availability. Those statements
+describe how the published source behaves as far as its author knows; they are not a
+promise, a guarantee or a term of any contract. The source is here so that you can
+check it yourself before you rely on it.
