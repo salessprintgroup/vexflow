@@ -53,6 +53,33 @@ def language():
     return code if code in available() else "en"
 
 
+_LISTENERS = []
+
+
+def on_language_change(callback):
+    """Register something that has to redraw itself when the language changes.
+
+    A registry rather than a direct call into the app module, because the app runs as
+    vexflow_app.py and is therefore called __main__ inside its own process. A window
+    doing `import vexflow_app` gets a SECOND, freshly executed copy of that module,
+    whose delegate is None — so the redraw was silently skipped and the language only
+    appeared to change on the next restart. That was the 1.2 bug. Nothing here depends
+    on what the app module happens to be called.
+    """
+    if callback not in _LISTENERS:
+        _LISTENERS.append(callback)
+
+
+def set_language(code):
+    """Store the choice, then tell everything already on screen to draw itself again."""
+    settings.set("ui_language", code)
+    for callback in list(_LISTENERS):
+        try:
+            callback()
+        except Exception:
+            pass    # a failed redraw must not take dictation down with it
+
+
 def _table(code):
     if code not in _TABLES:
         try:

@@ -249,11 +249,9 @@ class WelcomeWindow(NSObject):
         value = w.selected_value(sender, config.UI_LANGUAGES)
         if not value or value == strings.language():
             return
-        settings.set("ui_language", value)
-        # Redraw immediately rather than wait for the restart in step 3: somebody who
-        # cannot read this window needs it to change while they are looking at it.
-        import vexflow_app
-        vexflow_app.relanguage()
+        strings.set_language(value)
+        # Redraws immediately rather than waiting for the restart in step 3: somebody
+        # who cannot read this window needs it to change while they are looking at it.
 
     def openSettings_(self, _sender):
         self.window.performClose_(None)

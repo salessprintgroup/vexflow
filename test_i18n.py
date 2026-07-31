@@ -167,6 +167,17 @@ def relanguage_works():
     import onboarding
     import ui
     failures = []
+
+    # The switch has to reach the redraw. In 1.2 it did not: the window imported the
+    # app module by name, got a second copy of it because the running one is __main__,
+    # and called a no-op. Nothing about the windows themselves was wrong, which is why
+    # rebuilding them was not enough and this check exists separately.
+    fired = []
+    strings.on_language_change(lambda: fired.append(True))
+    strings.set_language(strings.language())     # same value, still has to notify
+    if not fired:
+        failures.append("strings.set_language did not notify its listeners")
+
     for cls, make in (("settings", lambda: ui.SettingsWindow.alloc().initWithEngine_(None)),
                       ("welcome", lambda: onboarding.WelcomeWindow.alloc().initWithApp_(None))):
         os.environ["VEXFLOW_UI_LANG"] = "en"

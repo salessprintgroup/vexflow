@@ -91,7 +91,7 @@ It is sixty lines and it downloads one file.
 <details>
 <summary>Taking the .pkg from Releases instead</summary>
 
-Download **`Vexflow-1.2.1.pkg`** from
+Download **`Vexflow-1.2.2.pkg`** from
 [Releases](https://github.com/salessprintgroup/vexflow/releases) into your Downloads
 folder, then paste one line into Terminal:
 

@@ -166,7 +166,7 @@ System Settings, add it back, and restart Vexflow.
 
 ## The installer will not open
 
-**"Vexflow-1.2.1.pkg cannot be opened because it is from an unidentified developer."**
+**"Vexflow-1.2.2.pkg cannot be opened because it is from an unidentified developer."**
 The package is not signed with a paid Apple certificate, so Gatekeeper stops the first
 open. Put the package in your Downloads folder and paste this into Terminal:
 

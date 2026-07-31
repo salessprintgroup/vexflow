@@ -697,14 +697,12 @@ class SettingsWindow(NSObject):
         value = w.selected_value(sender, config.UI_LANGUAGES)
         if not value or value == strings.language():
             return
-        settings.set("ui_language", value)
-        # Everything drawn once — labels, buttons, tab names, menu items — keeps the
-        # language it was drawn in, while anything recomputed on the refresh tick
-        # switches immediately. Left alone that produces a half-translated window,
-        # which reads as a broken app rather than as "restart to finish". So redraw
-        # the lot, here, now: the app delegate owns the menu bar and both windows.
-        import vexflow_app
-        vexflow_app.relanguage()
+        strings.set_language(value)
+        # set_language stores the choice and fires the redraw, so the menu bar and
+        # both windows change under the cursor. Everything drawn once — labels,
+        # buttons, tab names, menu items — keeps its old language otherwise, while the
+        # parts recomputed on the refresh tick switch at once, and half a translated
+        # window reads as a broken app.
 
     def changeLanguage_(self, sender):
         value = w.selected_value(sender, config.LANGUAGES)

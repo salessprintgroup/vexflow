@@ -103,10 +103,10 @@ def _hotkey_summary():
 def relanguage():
     """Redraw every piece of interface that was drawn in the previous language.
 
-    Called when the interface language changes. Without it the parts recomputed on the
-    refresh tick — status lines, the balance, field placeholders — switch at once while
-    labels, buttons, tab names and menu items keep the old language, and a half
-    translated window reads as a broken app rather than as a pending restart.
+    Registered with strings.on_language_change at startup, so the language switch
+    reaches it whatever this module happens to be called — it is __main__ in the
+    running app, and importing it by name elsewhere produces a second copy with no
+    delegate in it.
     """
     if _DELEGATE is None:
         return
@@ -486,6 +486,7 @@ def main():
         app.setActivationPolicy_(AppKit.NSApplicationActivationPolicyAccessory)
         _install_main_menu()
         _DELEGATE = Delegate.alloc().init()
+        strings.on_language_change(relanguage)
         _DELEGATE.setup()
         app.setDelegate_(_DELEGATE)
 
