@@ -118,9 +118,13 @@ in 2024:
 </details>
 
 The installer puts Vexflow in Applications, builds the Python environment it runs in,
-and starts it at login. On a Mac that has never had developer tools installed there is
-no Python to build it from, and Vexflow offers to have macOS install Apple's Command
-Line Tools rather than leaving you with a command to type. Then Vexflow opens a setup guide with four steps:
+and starts it at login.
+
+On a Mac that has never had developer tools installed there is no Python to build that
+environment from. Vexflow says so on first launch and offers to have macOS install
+Apple's Command Line Tools, rather than leaving you with a command to type.
+
+Then Vexflow opens a setup guide with four steps:
 
 <p align="center">
   <img src="docs/setup-guide.png" width="70%" alt="Setup guide">
