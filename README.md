@@ -70,7 +70,7 @@ network path in an afternoon, which is the point.
 
 ## Install
 
-Requires macOS 14 (Sonoma) or newer, on Apple silicon or Intel.
+Requires macOS 13 (Ventura) or newer, on Apple silicon or Intel.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/salessprintgroup/vexflow/main/get.sh | bash
@@ -91,7 +91,7 @@ It is sixty lines and it downloads one file.
 <details>
 <summary>Taking the .pkg from Releases instead</summary>
 
-Download **`Vexflow-1.2.3.pkg`** from
+Download **`Vexflow-1.2.4.pkg`** from
 [Releases](https://github.com/salessprintgroup/vexflow/releases) into your Downloads
 folder, then paste one line into Terminal:
 
@@ -113,7 +113,7 @@ in 2024:
 - **macOS 15 (Sequoia) and newer** — double-click, dismiss the warning, then open
   **System Settings → Privacy & Security**, scroll to *Security*, and click **Open
   Anyway** beside the Vexflow entry. Sequoia dropped the right-click override.
-- **macOS 14 (Sonoma)** — **right-click the package → Open → Open**.
+- **macOS 13–14 (Ventura, Sonoma)** — **right-click the package → Open → Open**.
 
 </details>
 

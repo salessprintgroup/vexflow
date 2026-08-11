@@ -21,7 +21,7 @@ say "Vexflow setup"
 
 # 1. macOS version -------------------------------------------------------------
 MACOS_MAJOR=$(sw_vers -productVersion | cut -d. -f1)
-[ "$MACOS_MAJOR" -ge 14 ] || die "macOS 14 (Sonoma) or newer is required; found $(sw_vers -productVersion)"
+[ "$MACOS_MAJOR" -ge 13 ] || die "macOS 13 (Ventura) or newer is required; found $(sw_vers -productVersion)"
 ok "macOS $(sw_vers -productVersion)"
 
 # 2. Python --------------------------------------------------------------------

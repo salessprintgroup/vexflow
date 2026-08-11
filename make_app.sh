@@ -49,7 +49,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>NSHumanReadableCopyright</key><string>© 2026 Sales Sprint Group LLC. MIT License. Provided as is, without warranty of any kind.</string>
   <key>NSMicrophoneUsageDescription</key><string>Vexflow sends your speech to Deepgram with your own API key so it can be typed as text.</string>
   <key>LSUIElement</key><true/>
-  <key>LSMinimumSystemVersion</key><string>14.0</string>
+  <key>LSMinimumSystemVersion</key><string>13.0</string>
 </dict></plist>
 PLIST
 

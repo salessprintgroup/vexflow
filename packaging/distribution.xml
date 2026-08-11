@@ -9,10 +9,18 @@
     <!-- No per-file customisation to offer: it is one app. -->
     <options customize="never" require-scripts="true" hostArchitectures="arm64,x86_64"/>
 
-    <!-- The window server APIs this relies on behave differently before Sonoma, and
-         the app has only been tested from 14 onwards. -->
+    <!-- 13, and the reason is Python rather than anything in AppKit. Nothing here
+         calls an API newer than macOS 10.14; what does depend on the version is the
+         interpreter Apple's Command Line Tools install, and bootstrap.sh needs 3.9.
+         Ventura's tools ship 3.9.6, Monterey's ship 3.8. Letting Monterey past this
+         check would trade an honest refusal here for an app that installs and then
+         cannot start, which is worse.
+
+         This used to say 14 with "only tested from 14 onwards" as the reason. That
+         was caution standing in for a measurement, and it turned away Macs that would
+         have run it. -->
     <volume-check>
-        <allowed-os-versions><os-version min="14.0"/></allowed-os-versions>
+        <allowed-os-versions><os-version min="13.0"/></allowed-os-versions>
     </volume-check>
 
     <choices-outline>

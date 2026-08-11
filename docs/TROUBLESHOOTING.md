@@ -147,8 +147,8 @@ recording; no restart needed.
 
 **On a fresh install Vexflow follows macOS.** If your Mac is set to a language Vexflow
 has no table for, it falls back to English. Either way, **Settings → Interface
-language** overrides it, and the change lands when Vexflow restarts — the button next
-to the menu does that for you.
+language** overrides it, and the change lands immediately — the window and the menu bar
+redraw as you choose it, with no restart.
 
 Nothing to fix in a file: the choice is stored as `ui_language` in
 `~/Library/Application Support/Vexflow/settings.json`, and an empty value there means
@@ -164,9 +164,24 @@ System Settings, add it back, and restart Vexflow.
 
 ---
 
+## "macOS version 13 or later is required"
+
+The installer refuses to run below Ventura, and the reason is Python. Nothing in
+Vexflow calls an API newer than macOS 10.14, but it is written in Python and does not
+carry an interpreter — it builds its environment from the one Apple's Command Line
+Tools install. Ventura's tools ship Python 3.9, which is what Vexflow needs; Monterey's
+ship 3.8. Letting Monterey past the check would swap a clear refusal for an app that
+installs and then never starts.
+
+On Monterey it can still work if you install a newer Python yourself, for example with
+Homebrew, and then run from source rather than from the package — see *Running from
+source* in the README.
+
+---
+
 ## The installer will not open
 
-**"Vexflow-1.2.3.pkg cannot be opened because it is from an unidentified developer."**
+**"Vexflow-1.2.4.pkg cannot be opened because it is from an unidentified developer."**
 The package is not signed with a paid Apple certificate, so Gatekeeper stops the first
 open. Put the package in your Downloads folder and paste this into Terminal:
 
@@ -181,7 +196,7 @@ means the package is somewhere other than Downloads — move it there and paste 
 Without Terminal, the route depends on the macOS version. On **macOS 15 (Sequoia) and
 newer**, dismiss the warning and go to **System Settings → Privacy & Security →
 Security → Open Anyway** — Sequoia removed the right-click override that older versions
-accepted. On **macOS 14**, right-click the package in Finder, choose **Open**, then
+accepted. On **macOS 13–14**, right-click the package in Finder, choose **Open**, then
 **Open** again in the dialog.
 
 **The install finishes but no icon appears.** The environment build failed. On a Mac
