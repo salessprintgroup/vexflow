@@ -7,9 +7,55 @@
 # that looks nothing like its cause.
 set -uo pipefail
 
-APP="/Applications/Vexflow.app"
-RESOURCES="$APP/Contents/Resources"
 LABEL="org.salessprintgroup.vexflow"
+
+# Find the bundle rather than assuming where it went. --install-location says
+# /Applications and BundleIsRelocatable is off, and neither is a guarantee: if some
+# other app in /Applications is already displayed as "Vexflow", macOS resolves the name
+# collision by wrapping ours in a localized folder, and the log reads
+#
+#   PackageKit: Applications/Vexflow.app relocated to
+#               Applications/Vexflow.localized/Vexflow.app
+#
+# This script used to hard-code /Applications/Vexflow.app. On such a Mac every step
+# below then addressed a bundle that was not there: bootstrap.sh "No such file or
+# directory", no Python environment, and a login item pointing at the stranger — so the
+# next login started somebody else's app instead of this one.
+#
+# $2 is the install location the installer actually used, checked first; the search is
+# for the case where it is the enclosing directory rather than the bundle.
+bundle_id() {
+  /usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$1/Contents/Info.plist" 2>/dev/null
+}
+
+APP=""
+for CANDIDATE in "${2:-}" "${2:-}/Vexflow.app" "/Applications/Vexflow.app"; do
+  [ -n "$CANDIDATE" ] && [ -d "$CANDIDATE" ] || continue
+  if [ "$(bundle_id "$CANDIDATE")" = "$LABEL" ]; then
+    APP="$CANDIDATE"
+    break
+  fi
+done
+
+# Read from find rather than expanded into the loop above, so a bundle inside a folder
+# with a space in its name survives.
+if [ -z "$APP" ]; then
+  while IFS= read -r CANDIDATE; do
+    if [ "$(bundle_id "$CANDIDATE")" = "$LABEL" ]; then
+      APP="$CANDIDATE"
+      break
+    fi
+  done < <(/usr/bin/find /Applications -maxdepth 2 -name 'Vexflow.app' -type d 2>/dev/null)
+fi
+
+if [ -z "$APP" ]; then
+  # Nothing to configure against. The launcher builds its own environment on first
+  # launch, so an app opened by hand still works; what is lost is the login item, and
+  # writing one that points somewhere wrong would be worse than not writing it.
+  echo "cannot locate the installed Vexflow.app; skipping per-user setup" >&2
+  exit 0
+fi
+RESOURCES="$APP/Contents/Resources"
 
 CONSOLE_USER="$(stat -f%Su /dev/console)"
 if [ -z "$CONSOLE_USER" ] || [ "$CONSOLE_USER" = "root" ]; then
@@ -37,6 +83,7 @@ else
   rm -f "$LOG"
 fi
 echo "=== Vexflow install $(date) ==="
+echo "app bundle: $APP"
 
 run_as_user() { sudo -u "$CONSOLE_USER" -H "$@"; }
 

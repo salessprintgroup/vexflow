@@ -488,7 +488,24 @@ def uninstall(purge=False):
         for spec in config.CLEAN_PROVIDERS.values():
             keychain_delete(*spec["keychain"])
 
-    return _delete_bundle("/Applications/Vexflow.app")
+    return _delete_bundle(_installed_bundle())
+
+
+def _installed_bundle():
+    """The .app this copy is running out of, or the default location if it is not one.
+
+    Hard-coding /Applications/Vexflow.app was wrong for the same reason it was wrong in
+    the installer: macOS wraps the bundle in /Applications/Vexflow.localized/ when
+    another app there already displays as "Vexflow", and removal then reported success
+    against a path with nothing at it. A source install (make_app.sh) runs from the
+    checkout rather than from inside the bundle, and there the fixed path is right.
+    """
+    app_dir = os.path.dirname(os.path.abspath(__file__))    # .../Contents/Resources/app
+    contents = os.path.dirname(os.path.dirname(app_dir))    # .../Contents
+    bundle = os.path.dirname(contents)                      # .../Vexflow.app
+    if os.path.basename(contents) == "Contents" and bundle.endswith(".app"):
+        return bundle
+    return "/Applications/Vexflow.app"
 
 
 def _delete_bundle(path):
