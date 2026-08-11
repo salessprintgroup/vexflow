@@ -107,8 +107,13 @@ test has to still pass.
 
 `make_release.sh` builds `dist/Vexflow-<version>.pkg` from `packaging/`:
 
-- `launcher.sh` becomes `Contents/MacOS/vexflow` and joins the bundled source to the
-  environment in Application Support.
+- `launcher.c` is compiled to `Contents/MacOS/vexflow`, the bundle executable. It runs
+  `launcher.sh` and does nothing else. It is a binary because macOS attributes privacy
+  requests to the image loaded at exec time: with a shell script there that image is
+  `/bin/bash`, which never gets a consent dialog, and the microphone request comes back
+  "not determined" without anyone being asked.
+- `launcher.sh` becomes `Contents/Resources/launcher.sh` and joins the bundled source
+  to the environment in Application Support.
 - `bootstrap.sh` creates that environment. It runs both from the installer and from
   the launcher if the environment goes missing, so it has to stay idempotent.
 - `postinstall` runs as root and drops to the console user for everything it creates.

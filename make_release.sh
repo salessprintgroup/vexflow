@@ -93,11 +93,24 @@ cp assets/menubar-*.png "$APP/Contents/Resources/app/assets/"
 cp assets/Vexflow.icns "$APP/Contents/Resources/app/assets/"
 cp assets/Vexflow.icns "$APP/Contents/Resources/Vexflow.icns"
 cp packaging/bootstrap.sh "$APP/Contents/Resources/bootstrap.sh"
-cp packaging/launcher.sh "$APP/Contents/MacOS/vexflow"
+cp packaging/launcher.sh "$APP/Contents/Resources/launcher.sh"
 # The licence and the notice travel inside the installed app, not only in the repo:
 # whoever ends up with the bundle has the terms it came under, without going to look.
 cp LICENSE NOTICE "$APP/Contents/Resources/"
-chmod +x "$APP/Contents/MacOS/vexflow" "$APP/Contents/Resources/bootstrap.sh"
+chmod +x "$APP/Contents/Resources/launcher.sh" "$APP/Contents/Resources/bootstrap.sh"
+
+# The bundle executable is a compiled stub that runs launcher.sh; it is not launcher.sh
+# itself any more. macOS attributes a privacy request to the image the kernel loaded at
+# exec time, and with a script there that image is /bin/bash — which macOS never raises
+# a consent dialog for, so the microphone request came back "not determined" without
+# asking anybody. packaging/launcher.c has the whole story.
+#
+# Left unsigned, like the rest of the bundle. An ad-hoc signature would tie the grant
+# to this build's hash and make every upgrade ask for the microphone again; unsigned,
+# macOS keys it to the path and the grant survives the next version.
+clang -arch x86_64 -arch arm64 -mmacosx-version-min=13.0 -O2 -Wall -Wextra \
+      -o "$APP/Contents/MacOS/vexflow" packaging/launcher.c
+ok "launcher stub ($(lipo -archs "$APP/Contents/MacOS/vexflow"))"
 
 # The microphone dialog belongs to macOS, not to us: it is drawn from Info.plist before
 # a line of Python runs, so it cannot follow the interface setting. What it can follow
