@@ -6,10 +6,11 @@
 # reaches back here by absolute path. Move this folder and you have to run this script
 # again.
 #
-# macOS attributes the permissions to "Python" rather than to "Vexflow", because the
-# launcher execs the interpreter. Getting a permission grant that names Vexflow would
-# require freezing the app with PyInstaller, which is a deliberate non-goal: shipping
-# readable source is the point of this project.
+# The bundle executable is a compiled stub (packaging/launcher.c) that runs the shell
+# launcher written below. That is what makes macOS name "Vexflow" in a permission
+# dialog instead of the interpreter — freezing the app with PyInstaller was assumed to
+# be the only way, and it is not. Nothing else about the arrangement changed: the code
+# it runs is still the readable source in this folder.
 set -euo pipefail
 DIR="$(cd "$(dirname "$0")" && pwd)"
 APP="/Applications/Vexflow.app"
@@ -53,7 +54,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 </dict></plist>
 PLIST
 
-cat > "$APP/Contents/MacOS/vexflow" <<LAUNCH
+cat > "$APP/Contents/Resources/launcher.sh" <<LAUNCH
 #!/bin/bash
 cd "$DIR"
 SETTINGS="\$HOME/Library/Application Support/Vexflow/settings.json"
@@ -68,7 +69,13 @@ else
 fi
 exec "$DIR/.venv/bin/python" "$DIR/vexflow_app.py" >> "\$LOG" 2>&1
 LAUNCH
-chmod +x "$APP/Contents/MacOS/vexflow"
+chmod +x "$APP/Contents/Resources/launcher.sh"
+
+# Same stub the release build uses, so a source install exercises the same permission
+# path as a packaged one. Single-architecture here: this bundle is for the Mac it was
+# built on, and the release build is the one that has to run on both.
+clang -mmacosx-version-min=13.0 -O2 -Wall -Wextra \
+      -o "$APP/Contents/MacOS/vexflow" "$DIR/packaging/launcher.c"
 
 # Finder caches icons by bundle mtime; without this it shows a stale or blank icon.
 touch "$APP"

@@ -2,7 +2,11 @@
 # Fetch the current Vexflow release and hand it to the installer.
 #
 #   curl -fsSL https://raw.githubusercontent.com/salessprintgroup/vexflow/main/get.sh | bash
-#   curl -fsSL https://raw.githubusercontent.com/salessprintgroup/vexflow/main/get.sh | bash -s -- --lang ru
+#
+# There is one package and it carries every language; the interface follows the system
+# on a fresh install and is a setting after that. --lang is still accepted, because the
+# two-package command above was handed out in chat windows that are still open, but it
+# no longer selects anything.
 #
 # Or, if piping a downloaded script into a shell is not something you do — and it is a
 # fair thing not to do — read it first and then run it:
@@ -22,19 +26,14 @@
 set -euo pipefail
 
 REPO="salessprintgroup/vexflow"
-LANG_CODE="en"
 while [ $# -gt 0 ]; do
   case "$1" in
-    --lang) LANG_CODE="${2:?--lang needs a code: en or ru}"; shift 2 ;;
-    -h|--help) sed -n '2,20p' "$0"; exit 0 ;;
+    --lang) shift; if [ $# -gt 0 ]; then shift; fi ;;
+    -h|--help) sed -n '2,25p' "$0"; exit 0 ;;
     *) echo "unknown option: $1" >&2; exit 2 ;;
   esac
 done
-case "$LANG_CODE" in
-  en) PATTERN='Vexflow-[0-9.]*\.pkg' ;;
-  ru) PATTERN='Vexflow-[0-9.]*-ru\.pkg' ;;
-  *) echo "unknown language: $LANG_CODE (en or ru)" >&2; exit 2 ;;
-esac
+PATTERN='Vexflow-[0-9.]*\.pkg'
 
 [ "$(uname)" = Darwin ] || { echo "Vexflow is a macOS application." >&2; exit 1; }
 

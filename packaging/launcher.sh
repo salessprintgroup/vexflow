@@ -1,5 +1,9 @@
 #!/bin/bash
-# Vexflow.app/Contents/MacOS/vexflow — what macOS actually starts.
+# Vexflow.app/Contents/Resources/launcher.sh — run by Contents/MacOS/vexflow, which is
+# a compiled stub that does nothing else. It has to be a binary: macOS attributes a
+# privacy request to the image loaded at exec time, and with this script as the bundle
+# executable that image is /bin/bash, which never gets a consent dialog. The whole
+# story is in packaging/launcher.c.
 #
 # The app bundle carries readable source in Contents/Resources/app; the Python
 # environment lives in the user's Application Support. This script joins the two.

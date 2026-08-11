@@ -12,7 +12,11 @@ SUPPORT="$HOME/Library/Application Support/Vexflow"
 launchctl unload "$PLIST" 2>/dev/null || true
 rm -f "$PLIST"
 pkill -f "$DIR/vexflow_app.py" 2>/dev/null || true
+# Both places a packaged install can land: macOS wraps the bundle in a localized folder
+# when another app in /Applications is already displayed as "Vexflow".
 rm -rf /Applications/Vexflow.app
+rm -rf /Applications/Vexflow.localized/Vexflow.app
+rmdir /Applications/Vexflow.localized 2>/dev/null || true
 rm -f "$SUPPORT/vexflow.lock"
 rm -f "$HOME/Library/Logs/vexflow.log" "$HOME/Library/Logs/vexflow-install.log"
 
